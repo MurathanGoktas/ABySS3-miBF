@@ -14,14 +14,14 @@
 #include <string>
 #include <stdint.h>
 
-#include "../btl_bloomfilter/MIBloomFilter.hpp"
-#include "../btl_bloomfilter/MIBFConstructSupport.hpp"
-#include "../btl_bloomfilter/vendor/stHashIterator.hpp"
-#include "../Common/sntHashIterator.hpp"
+#include "btl_bloomfilter/MIBloomFilter.hpp"
+#include "btl_bloomfilter/MIBFConstructSupport.hpp"
+#include "btl_bloomfilter/vendor/stHashIterator.hpp"
+#include "Common/sntHashIterator.hpp"
 
-#include "../btl_bloomfilter/BloomFilter.hpp"
+#include "btl_bloomfilter/BloomFilter.hpp"
 
-#include "../Common/Options.h"
+#include "Common/Options.h"
 
 #include <tuple>
 #include <google/dense_hash_map>
@@ -33,7 +33,7 @@
 #include <stdio.h>
 #ifndef KSEQ_INIT_NEW
 #define KSEQ_INIT_NEW
-#include "../Common/kseq.h"
+#include "Common/kseq.h"
 KSEQ_INIT(gzFile, gzread)
 #endif /*KSEQ_INIT_NEW*/
 
