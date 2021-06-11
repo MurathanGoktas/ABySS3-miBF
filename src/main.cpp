@@ -83,7 +83,7 @@ void myFunc(){
 
 
 
-    // Stage 2 for insertion ------------
+    // Stage 2 for ID insertion ------------
     
     // loop for seqeuences
     sequence = "AAAAAAAAAAAAAAA";
