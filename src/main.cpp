@@ -120,10 +120,12 @@ void myFunc(){
         m_data = miBF->getData(m_rank_pos);                 // m_data has ID's
         for(unsigned m = 0; m < miBF->getHashNum(); m++){   // iterate over ID's
             if(m_data[m] > miBF->s_mask){                     // if ID is saturated
-			    continue;
+			    // whatever the logic is for saturation
+                continue;
 			}
             else{
-                std::cout << "index: " << m_data[m] << std::endl;
+                // code here
+                std::cout << "index: " << m_data[m] << std::endl;   // for test purposes
             }
         }
     }
