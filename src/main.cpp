@@ -45,7 +45,7 @@ void myFunc(){
     // H = stHashIterator
 
     std::string filePrefix = "pref";
-    size_t m_expectedEntries = 2; 
+    size_t m_expectedEntries = 2000; 
     size_t m_kmerSize = 15;
     size_t hashNum = 2; 
     double occ = 0.5;
@@ -54,7 +54,7 @@ void myFunc(){
     spaced_seeds = {"111111111100001","100001111111111"}; // -- your spaced seed design
 
     // sequence for test purposes
-    std::string sequence = "AAAAAAAAAAAAAAA";
+    std::string sequence = "AAAAAAAAAAAAAAATTTTTTTTTT";
     // create MIBFCS -- this class is essential and needed for most operations as responsible for
     // operations such as random sampling
     MIBFConstructSupport<ID, H> miBFCS(m_expectedEntries, m_kmerSize,
@@ -72,8 +72,8 @@ void myFunc(){
     // later, this bv will be passed to miBF constructor implicitly
 
     // loop for sequences
-    H itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
-    miBFCS.insertBVColli(itr);
+    H itr1 = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
+    miBFCS.insertBVColli(itr1);
     // Stage 1 ends -------------
 
 
@@ -86,11 +86,11 @@ void myFunc(){
     // Stage 2 for ID insertion ------------
     
     // loop for seqeuences
-    sequence = "AAAAAAAAAAAAAAA";
-    itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
+    //sequence = "AAAAAAAAAAAAAAA";
+    H itr2 = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
     // define the id of insertion here
     uint id = 1;
-    miBFCS.insertMIBF(*miBF, itr, id);
+    miBFCS.insertMIBF(*miBF, itr2, id);
     // Stage 2 ends -----------
 
 
@@ -98,10 +98,10 @@ void myFunc(){
     // Stage 3 for saturation -------------
 
     // loop for every sequence in previous loop
-    sequence = "AAAAAAAAAAAAAAA";
-    itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
+    //sequence = "AAAAAAAAAAAAAAA";
+    H itr3 = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
     id = 1;
-    miBFCS.insertSaturation(*miBF, itr, id);    
+    miBFCS.insertSaturation(*miBF, itr3, id);    
     // Stage 3 ends -------------
 
 
@@ -114,20 +114,23 @@ void myFunc(){
     // Reusable vector for IDs in the indexes
 	vector<ID> m_data(miBF->getHashNum());
 
-    itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
-
-    if(miBF->atRank(*itr,m_rank_pos)){                      // if its a hit
-        m_data = miBF->getData(m_rank_pos);                 // m_data has ID's
-        for(unsigned m = 0; m < miBF->getHashNum(); m++){   // iterate over ID's
-            if(m_data[m] > miBF->s_mask){                     // if ID is saturated
-			    // whatever the logic is for saturation
-                continue;
-			}
-            else{
-                // code here
-                std::cout << "index: " << m_data[m] << std::endl;   // for test purposes
+    // loop for every sequence
+    H itr4 = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
+    while(itr4 != itr4.end()){
+        if(miBF->atRank(*itr4,m_rank_pos)){                      // if its a hit
+            m_data = miBF->getData(m_rank_pos);                 // m_data has ID's
+            for(unsigned m = 0; m < miBF->getHashNum(); m++){   // iterate over ID's
+                if(m_data[m] > miBF->s_mask){                     // if ID is saturated
+                    // whatever the logic is for saturation
+                    continue;
+                }
+                else{
+                    // code here
+                    std::cout << "index: " << m_data[m] << std::endl;   // for test purposes
+                }
             }
         }
+        ++itr4;
     }
 
     
