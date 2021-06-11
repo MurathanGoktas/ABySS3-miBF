@@ -9,7 +9,7 @@
 //#include "btl_bloomfilter/vendor/stHashIterator.hpp"
 //#include "Common/sntHashIterator.hpp"
 
-#include "btl_bloomfilter/BloomFilter.hpp"
+//#include "btl_bloomfilter/BloomFilter.hpp"
 
 #include "Common/Options.h"
 
@@ -36,8 +36,8 @@ H hashIterator(const string &seq,
     return H(seq, seedVal, hashNum, 1, kmerSize);
 }
 
-template<   typename ID=uint32_t, 
-            typename H=sntHashIterator>
+template<   typename ID = uint32_t, 
+            typename H = stHashIterator> // H = sntHashIterator -- if multi hash kmer used
 void myFunc(){
     //ID = uint32_t; 
     //H = sntHashIterator;
@@ -45,56 +45,95 @@ void myFunc(){
     // H = stHashIterator
 
     std::string filePrefix = "pref";
-    size_t m_expectedEntries = 1000; 
+    size_t m_expectedEntries = 2; 
     size_t m_kmerSize = 15;
-    size_t hashNum = 5; 
-    double occ = 0.8;
+    size_t hashNum = 2; 
+    double occ = 0.5;
     vector<string> spaced_seeds;
     // -- if using spaced seeds
-    // spaced_seeds = {"111100001","111100001"} // -- your spaced seed design
+    spaced_seeds = {"111111111100001","100001111111111"}; // -- your spaced seed design
 
-    std::string sequence = "";
+    // sequence for test purposes
+    std::string sequence = "AAAAAAAAAAAAAAA";
+    // create MIBFCS -- this class is essential and needed for most operations as responsible for
+    // operations such as random sampling
     MIBFConstructSupport<ID, H> miBFCS(m_expectedEntries, m_kmerSize,
             hashNum, occ, spaced_seeds);
+    // Parses spaced seeds
     vector<vector<unsigned> > ssVal;
     if (!spaced_seeds.empty()) {
         ssVal =	MIBloomFilter<ID>::parseSeedString(spaced_seeds);
     }
-    // calculate and allocate the memory for bit vector memory
     
-    // Stage 1 for bit vector insertion
+    // Stage 1 for bit vector insertion -------
+    // calculate and allocate the memory for bit vector memory
+    // Bit vector is first of 3 arrays of miBF data structure and acts as a bit bloom filter
+    // miBFCS is responsible for creating and populating this vector 
+    // later, this bv will be passed to miBF constructor implicitly
+
+    // loop for sequences
     H itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
+    std::cout << "test 4" << std::endl;
     miBFCS.insertBVColli(itr);
+    // Stage 1 ends -------------
 
-    //generateBV(miBFCS, ssVal);
 
-    // initiate the BF with the created bit vector
+
+    // miBF must be created AFTER stage 1 BEFORE stage 2
     MIBloomFilter<ID> *miBF = miBFCS.getEmptyMIBF();
 
-    // Stage 2 for insertion ------------
 
+
+    // Stage 2 for insertion ------------
+    
     // loop for seqeuences
-    sequence = "";
+    sequence = "AAAAAAAAAAAAAAA";
     itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
     // define the id of insertion here
-    uint id = 0;
+    uint id = 1;
     miBFCS.insertMIBF(*miBF, itr, id);
+    // Stage 2 ends -----------
+
+
 
     // Stage 3 for saturation -------------
 
     // loop for every sequence in previous loop
-    sequence = "";
+    sequence = "AAAAAAAAAAAAAAA";
     itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
-    id = 0;
+    id = 1;
     miBFCS.insertSaturation(*miBF, itr, id);    
+    // Stage 3 ends -------------
 
-    // store Bloom filter
-    miBF->store(filePrefix + ".bf");
 
+
+
+    // QUERYING STAGE --------------
+
+    // Reusable vector for indexes
+    vector<uint64_t> m_rank_pos(miBF->getHashNum());
+    // Reusable vector for IDs in the indexes
+	vector<ID> m_data(miBF->getHashNum());
+
+    itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
+
+    if(miBF->atRank(*itr,m_rank_pos)){                      // if its a hit
+        m_data = miBF->getData(m_rank_pos);                 // m_data has ID's
+        for(unsigned m = 0; m < miBF->getHashNum(); m++){   // iterate over ID's
+            if(m_data[m] > miBF->MASK){                     // if ID is saturated
+			    continue;
+			}
+            else{
+                std::cout << "index: " << m_data[m] << std::endl;
+            }
+        }
+    }
+
+    
     delete(miBF);
 }
 
 int main(){
-
+    std::cout << "test 1" << std::endl;
     myFunc();
 }
