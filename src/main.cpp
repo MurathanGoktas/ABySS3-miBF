@@ -73,7 +73,6 @@ void myFunc(){
 
     // loop for sequences
     H itr = hashIterator<H>(sequence, ssVal, hashNum, m_kmerSize);
-    std::cout << "test 4" << std::endl;
     miBFCS.insertBVColli(itr);
     // Stage 1 ends -------------
 
@@ -120,7 +119,7 @@ void myFunc(){
     if(miBF->atRank(*itr,m_rank_pos)){                      // if its a hit
         m_data = miBF->getData(m_rank_pos);                 // m_data has ID's
         for(unsigned m = 0; m < miBF->getHashNum(); m++){   // iterate over ID's
-            if(m_data[m] > miBF->MASK){                     // if ID is saturated
+            if(m_data[m] > miBF->s_mask){                     // if ID is saturated
 			    continue;
 			}
             else{
@@ -134,6 +133,5 @@ void myFunc(){
 }
 
 int main(){
-    std::cout << "test 1" << std::endl;
     myFunc();
 }
