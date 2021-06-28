@@ -1,3 +1,6 @@
 [submodule "src/btl_bloomfilter"]
 	path = src/btl_bloomfilter
 	url = https://github.com/bcgsc/btl_bloomfilter.git
+[submodule "src/btllib"]
+	path = src/btllib
+	url = https://github.com/bcgsc/btllib.git
